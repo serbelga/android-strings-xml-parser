@@ -4,15 +4,15 @@ import org.xml.sax.helpers.DefaultHandler
 class StringResourceHandler : DefaultHandler() {
     val stringResources = mutableListOf<StringResource>()
 
-    private var key: String? = ""
-    private var value = ""
+    private var currentKey: String? = ""
+    private var currentValue = ""
 
     override fun startElement(uri: String?, localName: String?, qName: String?, attributes: Attributes?) {
-        value = ""
+        currentValue = ""
 
         when {
             qName?.equals(STRING_TAG, ignoreCase = true) == true -> {
-                key = attributes?.getValue(NAME_ATTRIBUTE)
+                currentKey = attributes?.getValue(NAME_ATTRIBUTE)
             }
             qName?.equals(RESOURCES_TAG, ignoreCase = true) == true -> {
                 stringResources.clear()
@@ -25,15 +25,15 @@ class StringResourceHandler : DefaultHandler() {
         super.endElement(uri, localName, qName)
 
         if (qName?.equals(STRING_TAG, ignoreCase = true) == true) {
-            key?.takeIf { it.isNotBlank() }?.let {
-                stringResources.add(StringResource(it, value))
+            currentKey?.takeIf { it.isNotBlank() }?.let {
+                stringResources.add(StringResource(it, currentValue))
             }
         }
     }
 
     override fun characters(ch: CharArray, start: Int, length: Int) {
         super.characters(ch, start, length)
-        value += String(ch, start, length)
+        currentValue += String(ch, start, length)
     }
 
     companion object {
